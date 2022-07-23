@@ -13,7 +13,12 @@ module.exports = {
       blue: colors.blue,
       red: colors.red,
     },
-    extend: {},
+    extend: {
+      colors:{
+        'bga-blue': '#252644',
+        'bga-light-blue': '#334E96',
+      },
+    },
   },
   plugins: [],
 };

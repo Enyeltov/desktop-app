@@ -65,6 +65,7 @@ export default function WatchPoliza() {
             
             const polizas = await getPolizaUnique(user.token, polizaId);
             getSubranches(polizas.branchTypeId).then(data => setSelectSubBranch(data));
+            console.log(selectSubBranch, 'test');
             console.log(polizas, "polizas");
 
             setPoliza({
@@ -74,7 +75,6 @@ export default function WatchPoliza() {
             setLoading(false);
         }
         async function getSubranches(branchId) {
-            // console.log(user, "user");
             if (!user.token) {
                 router.push("/auth")
             }
@@ -137,7 +137,7 @@ export default function WatchPoliza() {
     }
 
     // generals input
-    const inputData = getInputData(register, errors, classes, polizas);
+    const inputData = getInputData(register, errors, classes, watch, polizas);
 
     const vehicleInputData = [...inputData,
     ...getVehicleInputData(register, errors, classes, polizas)

@@ -1,4 +1,5 @@
-export default function InputGroup({ name, type, placeholder, text, register, validate, errors, classes, defaultValue = undefined, checked = null, disabled = false, pattern = null }) {
+export default function InputGroup({ name, type, placeholder, text, register, validate, errors, classes, value = undefined, defaultValue = undefined, checked = null, disabled = false, pattern = null }) {
+  console.log(defaultValue, 'defaultValue');
   return (
     <div className={classes.div}>
       <label
@@ -9,8 +10,9 @@ export default function InputGroup({ name, type, placeholder, text, register, va
       </label>
       <input
         className={classes.input}
-        {...register(name, validate)}
+        {...register(name,{value:value})}
         type={type}
+        value ={value}
         defaultValue={defaultValue}
         checked={checked}
         placeholder={placeholder}

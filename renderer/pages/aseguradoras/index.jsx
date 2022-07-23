@@ -11,6 +11,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
+import Loader from "../../components/Loader/Loader";
 
 const schema = yup
   .object({
@@ -42,11 +43,13 @@ export default function Aseguradoras() {
 
   const classes = {
     label: "text-sm font-medium text-gray-900 block mb-2",
-    input: "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
-    select: "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
-    div: "",
-    error: 'text-red-500 text-sm font-normal mb-2'
-  }
+    input:
+      "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
+    div: "col-span-6 sm:col-span-3",
+    select:
+      "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
+    error: "text-red-500 text-sm font-normal mb-2",
+  };
 
   const data = [
     {
@@ -141,7 +144,7 @@ export default function Aseguradoras() {
   const { insuranceCarriers, names, token } = insuranceCarrier
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return <Loader/>;
   }
 
   return (

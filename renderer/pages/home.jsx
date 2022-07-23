@@ -6,7 +6,7 @@ function Home() {
   return (
     <>
       <Head>
-        <title>Home - Nextron (with-javascript-tailwindcss)</title>
+        <title>Home - Best Global ADvisors</title>
       </Head>
       <div className='grid grid-col-1 text-2xl w-full text-center'>
         

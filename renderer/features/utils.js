@@ -1,4 +1,5 @@
 import tinydate from "tinydate";
+import { ipcRenderer } from "electron";
 
 export function convertDate(string, format) {
     
@@ -23,3 +24,47 @@ export function getAge(dateString)
         return null;
     }
 }
+
+export async function deleteRegistry(user, router, config, id, serviceRoute) {
+    if (!user.token) {
+      router.push("/auth");
+    }
+  
+    const apiUrl = config.apiUrl();
+    const myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${user.token}`);
+    myHeaders.append("Content-Type", "application/json");
+  
+    const requestOptions = {
+      method: "DELETE",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+  
+    console.log(requestOptions, "requestOptions");
+  
+    try {
+      const response = await fetch(
+        `${apiUrl}${serviceRoute}/${id}`,
+        requestOptions
+      );
+      if (response.status === 201) {
+        const data = await response.json();
+        return data;
+      } 
+      else {
+        if (response.status >= 400) {
+          console.log(response);
+          throw response
+        } else {
+          return false;
+        }
+      }
+    } catch (error) {
+      console.log(error);
+      error.json().then(body => {
+          ipcRenderer.invoke('showDialog', body.message)
+      })
+      return false;
+    }
+  }

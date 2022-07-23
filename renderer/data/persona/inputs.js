@@ -1,5 +1,7 @@
-export function getPersonInputData(register, errors, classes) {
+import { convertDate } from "../../features/utils";
 
+export function getPersonInputData(register, errors, classes, data = null) {
+  console.log(data, 'test');
     return [
         {
             id: 5,
@@ -9,7 +11,8 @@ export function getPersonInputData(register, errors, classes) {
             register,
             errors,
             text: "Documento",
-            classes
+            classes,
+            defaultValue: data ? data.Persons.document : null
           },
           {
             id: 1,
@@ -19,7 +22,8 @@ export function getPersonInputData(register, errors, classes) {
             register,
             errors,
             text: "Correo Electronico",
-            classes
+            classes,
+            defaultValue: data ? data.Persons.email : null
           },
           {
             id: 2,
@@ -29,7 +33,8 @@ export function getPersonInputData(register, errors, classes) {
             register,
             errors,
             text: "Nombres",
-            classes
+            classes,
+            defaultValue: data ? data.Persons.name : null
           },
           {
             id: 3,
@@ -39,7 +44,8 @@ export function getPersonInputData(register, errors, classes) {
             register,
             errors,
             text: "Apellidos",
-            classes
+            classes,
+            defaultValue: data ? data.Persons.lastName : null
           },
           {
             id: 6,
@@ -49,7 +55,8 @@ export function getPersonInputData(register, errors, classes) {
             register,
             errors,
             text: "Fecha de Nacimiento",
-            classes
+            classes,
+            defaultValue: data ? convertDate(data.Persons.birthDate, '{YYYY}-{MM}-{DD}') : null
           },
           {
             id: 7,
@@ -60,7 +67,8 @@ export function getPersonInputData(register, errors, classes) {
             errors,
             text: "Telefono",
             pattern : '[0-9]{4}-[0-9]{7}',
-            classes
+            classes,
+            defaultValue: data ? data.Persons.phone : null
           },
     ]
 }

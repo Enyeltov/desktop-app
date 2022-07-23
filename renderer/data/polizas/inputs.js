@@ -1,7 +1,6 @@
 import { convertDate } from "../../features/utils";
 
-export function getInputData(register, errors, classes, polizas = null) {
-
+export function getInputData(register, errors, classes, watch, polizas = null) {
     return [
         {
             id: 2,
@@ -86,6 +85,33 @@ export function getInputData(register, errors, classes, polizas = null) {
             classes
         },
         {
+            id: 11,
+            name: "ValorFinalizacion",
+            autocomplete: "on",
+            type: "number",
+            // value: polizas?.ClientHasPolicies[0].ClientHasTaker[0].PolicyDetails[0].ValorFinalizacion,
+            defaultValue: polizas?.ClientHasPolicies[0].ClientHasTaker[0].PolicyDetails[0].ValorFinalizacion,
+            placeholder: "",
+            register,
+            errors,
+            text: "Valor de Finalizacion",
+            classes
+        },
+        {
+            id: 12,
+            name: "Total",
+            autocomplete: "on",
+            type: "number",
+            disabled: true,
+            value: +watch('primeValue', 0) + +watch('AnnexValue', 0) + +watch('ValorFinalizacion', 0),
+            // defaultValue: polizas?.ClientHasPolicies[0].ClientHasTaker[0].PolicyDetails[0].Total,
+            placeholder: "",
+            register,
+            errors,
+            text: "Valor Total",
+            classes
+        },
+        {
             id: 9,
             name: "comission",
             autocomplete: "on",
@@ -114,32 +140,6 @@ export function getInputData(register, errors, classes, polizas = null) {
                 //     "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
                 // div: "col-span-6 sm:col-span-3",
             },
-        },
-        {
-            id: 11,
-            name: "ValorFinalizacion",
-            autocomplete: "on",
-            type: "number",
-            // value: polizas?.ClientHasPolicies[0].ClientHasTaker[0].PolicyDetails[0].ValorFinalizacion,
-            defaultValue: polizas?.ClientHasPolicies[0].ClientHasTaker[0].PolicyDetails[0].ValorFinalizacion,
-            placeholder: "",
-            register,
-            errors,
-            text: "Valor de Finalizacion",
-            classes
-        },
-        {
-            id: 12,
-            name: "Total",
-            autocomplete: "on",
-            type: "number",
-            // value: polizas?.ClientHasPolicies[0].ClientHasTaker[0].PolicyDetails[0].Total,
-            defaultValue: polizas?.ClientHasPolicies[0].ClientHasTaker[0].PolicyDetails[0].Total,
-            placeholder: "",
-            register,
-            errors,
-            text: "Valor Total",
-            classes
         },
         {
             id: 35,

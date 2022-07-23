@@ -5,8 +5,8 @@ import SidebarList from "../List/SidebarList";
 export default function Sidebar({ children }) {
   const list = [
     {
-      title: "Home",
-      link: "/home",
+      title: "Dashboard",
+      link: "/dashboard",
       image: "/images/dashboard.svg",
     },
     {

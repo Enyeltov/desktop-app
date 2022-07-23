@@ -21,45 +21,12 @@ import SelectGroup from "../../components/forms/SelectGroup";
 import { getPersonInputData } from "../../data/persona/inputs";
 import { fileteredData } from "../../features/policies";
 import { getPersonSelectData } from "../../data/persona/selects";
-import { getAge } from "../../features/utils";
+import { deleteRegistry, getAge } from "../../features/utils";
+import Loader from "../../components/Loader/Loader";
+import { personSchema } from "../../data/persona/schema";
+import { ipcRenderer } from "electron";
 
-const schema = yup
-  .object({
-    email: yup.string().email("Email no valido").required("Email Requerido"),
-    name: yup
-      .string()
-      .typeError("Caracteres ingresados no validos")
-      .required("El nombre es requerido"),
-    lastName: yup
-      .string()
-      .typeError("Caracteres ingresados no validos")
-      .required("El apellido es requerido"),
-    civilPolicyStatus: yup
-      .string()
-      .typeError("Caracteres ingresados no validos"),
-    company: yup.string().typeError("Caracteres ingresados no validos"),
-    birthDate: yup
-      .date()
-      .typeError("Debe ingresar una fecha")
-      .required("La Fecha de Nacimiento es Requerida"),
-    document: yup
-      .number()
-      .typeError("Debe ingresar un numero")
-      .required("El documento es Requerido"),
-    documentTypeId: yup
-      .number()
-      .typeError("Seleccione el tipo de documento")
-      .required("El documento es Requerido"),
-    phone: yup
-      .string()
-      .typeError("Caracteres ingresados no validos")
-      .notRequired(),
-    cityId: yup
-      .number()
-      .typeError("Seleccione una Ciudad")
-      .required("La ciudad de residencia es requerida"),
-  })
-  .required();
+const schema = personSchema();
 
 export default function Agentes() {
   const [showModal, setShowModal] = useState(false);
@@ -83,6 +50,7 @@ export default function Agentes() {
     watch,
     formState: { errors },
   } = useForm({
+    mode: "onBlur",
     resolver: yupResolver(schema),
   });
 
@@ -124,8 +92,9 @@ export default function Agentes() {
         "Documento",
         "Genero",
         "Edad",
+        "Acciones"
       ];
-      const agentes = await getAgent(user.token);
+      const agentes = await getAgent(user.token, user, router);
 
       setAgente({
         names: head,
@@ -175,7 +144,7 @@ export default function Agentes() {
   const { agentes, names, token } = agente;
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return <Loader/>;
   }
 
   return (
@@ -189,7 +158,7 @@ export default function Agentes() {
               }}
               type="button"
               data-modal-toggle="add-user-modal"
-              className="w-1/2 text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto"
+              className="w-1/2 text-white bg-bga-light-blue hover:bg-blue-800 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto"
             >
               <svg
                 className="-ml-1 mr-2 h-6 w-6"
@@ -228,7 +197,7 @@ export default function Agentes() {
           <Modal
             setShowModal={setShowModal}
             submitFunction={async (data) => {
-              const newAgent = await createAgent(data, token);
+              const newAgent = await createAgent(data, token, user, router);
               setAgente({
                 ...agente,
                 agentes: [...agentes, newAgent],
@@ -247,7 +216,7 @@ export default function Agentes() {
   );
 }
 
-async function createAgent(data, token) {
+async function createAgent(data, token, user, router) {
   const apiUrl = config.apiUrl();
 
   const myHeaders = new Headers();
@@ -263,16 +232,23 @@ async function createAgent(data, token) {
   console.log(JSON.stringify(data), "1");
   try {
     const response = await fetch(`${apiUrl}/agents`, requestOptions);
+    if ((response.status === 200 || response.status === 201) && response.ok) {
     const data = await response.json();
     console.log(data, "2");
-    return filteredAgentData(data);
+    return filteredAgentData(data, user, router);
+    } else {
+      throw response
+    }
   } catch (error) {
-    console.error(error);
-    return error;
+    error.json().then(body => {
+      console.log(body);
+      ipcRenderer.invoke('showDialog', body.message)            
+    })
+    return false;
   }
 }
 
-async function getAgent(token) {
+async function getAgent(token, user, router) {
   const apiUrl = config.apiUrl();
 
   const myHeaders = new Headers();
@@ -288,14 +264,14 @@ async function getAgent(token) {
     const response = await fetch(`${apiUrl}/agents`, requestOptions);
     const data = await response.json();
     console.log(data, "data");
-    return filteredAgentData(data);
+    return filteredAgentData(data, user, router);
   } catch (error) {
     console.error(error);
     return;
   }
 }
 
-const list = (id) => [
+const list = (id, personId, user, router) => [
   {
     link: `/agentes/${id}`,
     image: "/images/watch.svg",
@@ -309,23 +285,25 @@ const list = (id) => [
     image: "/images/delete.svg",
     handleClick: (e) => {
       e.preventDefault();
-      console.log("delete", id);
+      console.log("delete", personId);
+      deleteRegistry(user, router, config, personId, '/agents')
     },
   },
 ];
 
-function filteredAgentData(poliza) {
-  return poliza.map((el) => {
+function filteredAgentData(agent, user, router) {
+  return agent.map((el) => {
     const data = {
       id: el.id,
       fullName: `${el.Persons.name} ${el.Persons.lastName}`,
-      document: `${el.Persons.documentTypeId} ${el.Persons.document}`,
+      document: `${el.Persons.documentTypeId == 1 ? 'V-' : 'J-'}${el.Persons.document}`,
       gender: el.Persons.gender,
       birthDate: getAge(el.Persons.birthDate),
-      Acciones: list(el.id).map((item, index) => (
+      Acciones: list(el.id, el.Persons.id, user, router).map((item, index) => (
         <ActionRow {...item} key={index} />
       )),
     };
+    console.log(data, 'data');
     return data;
   });
 }

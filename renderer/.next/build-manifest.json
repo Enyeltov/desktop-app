@@ -30,20 +30,15 @@
       "static/chunks/main.js",
       "static/chunks/pages/agentes.js"
     ],
+    "/agentes/update/[id]": [
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/agentes/update/[id].js"
+    ],
     "/auth": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
       "static/chunks/pages/auth.js"
-    ],
-    "/home": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/home.js"
-    ],
-    "/polizas": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/polizas.js"
     ]
   },
   "ampFirstPages": []

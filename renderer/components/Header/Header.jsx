@@ -6,16 +6,16 @@ import HeaderWidget from "./HeaderWidget";
 
 export default function Header({ children, title }) {
 
-    const headerWidget = [
-        {
-            title: "chat",
-            image: "/images/message.svg"
-        },
-        {
-            title: "notifications",
-            image: "/images/notification.svg"
-        }
-    ]
+    // const headerWidget = [
+    //     {
+    //         title: "chat",
+    //         image: "/images/message.svg"
+    //     },
+    //     {
+    //         title: "notifications",
+    //         image: "/images/notification.svg"
+    //     }
+    // ]
 
     return (
         <>
@@ -35,9 +35,9 @@ export default function Header({ children, title }) {
                     <div className="flex space-x-4">
                         <Search />
                         <SearchMobile />
-                        {headerWidget.map((item, index) => (
+                        {/* {headerWidget.map((item, index) => (
                             <HeaderWidget {...item} key={index} />
-                        ))}
+                        ))} */}
                     </div>
                 </div>
             </header>

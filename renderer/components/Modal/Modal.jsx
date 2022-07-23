@@ -3,10 +3,9 @@ import InputGroup from "../forms/InputGroup"
 export default function Modal({ title, data, handleSubmit, submitFunction, setShowModal, beforeSelect = null, afterSelect= null }) {
 
     const onSubmit = data => {
-        console.log(data);
         submitFunction(data).then(res => {
             console.log(res);
-            setShowModal(false);
+            res ? setShowModal(false): null;
         }).catch(err => {
             console.log(err);
         })
@@ -45,6 +44,7 @@ export default function Modal({ title, data, handleSubmit, submitFunction, setSh
                             </div>
                             <div className="items-center p-6 border-t border-gray-200 rounded-b">
                                 <button className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-cyan-900 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="submit">Añadir</button>
+                                <button type="button" onClick={() => setShowModal(false)} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 mx-1">Regresar</button>
                             </div>
                         </form>
                     </div>

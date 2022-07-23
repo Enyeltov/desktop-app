@@ -24,6 +24,7 @@ export default function CreatePoliza() {
         getValues,
         formState: { errors },
     } = useForm({
+        mode: 'onBlur',
         resolver: yupResolver(schema),
     });
 
@@ -99,7 +100,7 @@ export default function CreatePoliza() {
         }
     ]
     // generals input
-    const inputData = getInputData(register, errors, classes);
+    const inputData = getInputData(register, errors, classes, watch);
 
     const vehicleInputData = [...inputData,
     ...getVehicleInputData(register, errors, classes)
@@ -250,6 +251,7 @@ export default function CreatePoliza() {
                         {stateMachine[selectedBranch.value]}
                     </div>
                     <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Añadir</button>
+                    <button type="button" onClick={() => router.push('/polizas')} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 mx-1">Regresar</button>
                 </form>
 
             </Layout>

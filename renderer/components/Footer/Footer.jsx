@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Footer() {
     return (
-        <footer className="p-4 bg-gray-900">
+        <footer className="p-4 bg-bga-blue">
     <div className="md:flex md:justify-between">
         <div className="mb-6 md:mb-0">
             <a href="#" target="_blank" className="flex items-center space-x-2">
@@ -11,7 +11,7 @@ export default function Footer() {
                 <span className="self-center text-xl font-semibold whitespace-nowrap text-white align-center">Best Global Advisors</span>
             </a>
         </div>
-        <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
+        {/* <div className="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
             <div>
                 <h3 className="mb-6 text-sm font-semibold text-white uppercase dark:text-white">Resources</h3>
                 <ul>
@@ -51,11 +51,11 @@ export default function Footer() {
                     </li>
                 </ul>
             </div>
-        </div>
+        </div> */}
     </div>
-    <hr className="my-6 border-gray-700 sm:mx-auto lg:my-8"/>
+    <hr className="my-2 border-gray-700 sm:mx-auto lg:my-2"/>
     <div className="sm:flex sm:items-center sm:justify-between">
-        <span className="text-sm text-gray-300 sm:text-center ">© 2022 <a href="https://flowbite.com" target="_blank" className="hover:underline">Best Global Advisors</a>. Todos los Derechos Reservados.
+        <span className="text-sm text-gray-300 sm:text-center ">© 2022 <a href="https://bgabgb.com" target="_blank" className="hover:underline">Best Global Advisors</a>. Todos los Derechos Reservados.
 </span>
     </div>
 </footer>

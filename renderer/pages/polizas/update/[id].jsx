@@ -12,6 +12,7 @@ import { fileteredClientData, fileteredData, getPoliciesGeneralData, submitPolic
 import { getInputData, getPatrimonialInputData, getTravelInputData, getVehicleInputData } from "../../../data/polizas/inputs";
 import { getSelectPolizaData } from "../../../data/polizas/select";
 import { polizaSchema } from "../../../data/polizas/schema";
+import Loader from "../../../components/Loader/Loader";
 
 const schema = polizaSchema();
 
@@ -24,6 +25,7 @@ export default function UpdatePoliza() {
         formState: { errors },
     } = useForm({
         defaultValues: polizas,
+        mode: 'onBlur',
         resolver: yupResolver(schema),
     });
 
@@ -137,7 +139,7 @@ export default function UpdatePoliza() {
     }
 
     // generals input
-    const inputData = getInputData(register, errors, classes, polizas);
+    const inputData = getInputData(register, errors, classes,watch, polizas);
 
     const vehicleInputData = [...inputData,
     ...getVehicleInputData(register, errors, classes, polizas)
@@ -242,12 +244,12 @@ export default function UpdatePoliza() {
 
     function onSubmit(data) {
         console.log(data, "data");
-        const serviceRoute = postStateMachine[polizas.branchTypes.name]
+        const serviceRoute = postStateMachine[polizas.BranchTypes.name]
         data.branchTypeId = poliza.branchTypeId
 
         console.log(serviceRoute, "serviceRoute");
 
-        updatePolicy(user, router, config, serviceRoute, data)
+        updatePolicy(user, router, config, serviceRoute, data, polizaId)
             .then(response => {
                 console.log(response);
                 if (response) {
@@ -260,7 +262,7 @@ export default function UpdatePoliza() {
 
 
     if (loading || !polizas) {
-        return <div>Cargando...</div>;
+        return <Loader/>;
     }
     
     return (
@@ -271,7 +273,8 @@ export default function UpdatePoliza() {
                     <div className="grid gap-6 mb-6 lg:grid-cols-2">
                         {stateMachine[polizas.BranchTypes.name]}
                     </div>
-                    <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Añadir</button>
+                    <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Actualizar</button>
+                    <button type="button" onClick={() => router.push('/polizas')} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 mx-1">Regresar</button>
                 </form>
 
             </Layout>

@@ -1,4 +1,4 @@
-export function getPersonSelectData(register, errors, classes) {
+export function getPersonSelectData(register, errors, classes, data) {
     return [
             {
                 id: 10,
@@ -7,6 +7,7 @@ export function getPersonSelectData(register, errors, classes) {
                 errors,
                 name: 'gender',
                 text: "Genero",
+                defaultValue: data ? data.Persons.gender : null
             },
             {
                 id: 11,
@@ -15,6 +16,7 @@ export function getPersonSelectData(register, errors, classes) {
                 errors,
                 name: 'cityId',
                 text: "Ciudad de Residencia",
+                defaultValue: data ? data.Persons.Addresses.cityId : null
             }
     ]
 }

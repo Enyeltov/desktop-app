@@ -10,6 +10,8 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import ButtonIcon from "../../components/Buttons/ButtonIcon";
 import ActionRow from "../../components/Table/Row/ActionRow";
+import Loader from "../../components/Loader/Loader";
+import { deleteRegistry } from "../../features/utils";
 
 
 export default function Polizas() {
@@ -53,7 +55,7 @@ export default function Polizas() {
                 "Valor Asegurado",
                 "Acciones",
             ];
-            const polizas = await getPoliza(user.token);
+            const polizas = await getPoliza(user.token, user, router);
 
             setPoliza({
                 names: head,
@@ -68,7 +70,7 @@ export default function Polizas() {
     const { polizas, names, token } = poliza
 
     if (loading) {
-        return <div>Cargando...</div>;
+        return <Loader/>;
     }
 
     return (
@@ -78,7 +80,7 @@ export default function Polizas() {
                     <div className="flex items-center space-x-2 sm:space-x-3 ml-auto">
                         <Link href="/polizas/create">
                             <a
-                                className="w-1/2 text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto"
+                                className="w-1/2 text-white bg-bga-light-blue hover:bg-blue-800 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto"
                             >
                                 <svg
                                     className="-ml-1 mr-2 h-6 w-6"
@@ -97,7 +99,7 @@ export default function Polizas() {
                         </Link>
                     </div>
                 </div>
-
+                <div className="">
                 <Table>
                     <TableHead names={names} />
                     <TableBody>
@@ -113,6 +115,7 @@ export default function Polizas() {
                         })}
                     </TableBody>
                 </Table>
+                </div>
             </Layout>
         </>
     );
@@ -150,10 +153,9 @@ async function createPoliza(data, token) {
     }
 }
 
-async function getPoliza(token) {
+async function getPoliza(token, user, router) {
     const apiUrl = config.apiUrl();
     // const token =
-    //   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIxLCJlbWFpbCI6Imd1aWxsZUBhZG1pbi5jb20iLCJpYXQiOjE2NTQ4NTEzMDQsImV4cCI6MTY1NDg1NDkwNH0.KjkzuugtnXjuItYLACdlbEq25zd63DzkR93pea-Lx4w";
 
     const myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${token}`);
@@ -168,14 +170,14 @@ async function getPoliza(token) {
         const response = await fetch(`${apiUrl}/policies`, requestOptions);
         const data = await response.json();
         console.log(data, 'data');
-        return filteredPoliza(data);
+        return filteredPoliza(data, user, router);
     } catch (error) {
         console.error(error);
         return;
     }
 }
 
-const list = (id) => (
+const list = (id, user, router) => (
     [
         {
             link: `/polizas/${id}`,
@@ -191,19 +193,20 @@ const list = (id) => (
             handleClick: (e) => {
                 e.preventDefault();
                 console.log("delete", id);
+                deleteRegistry(user, router, config, id, '/policies')
             }
         },
     ]
 );
 
-function filteredPoliza(poliza) {
+function filteredPoliza(poliza, user, router) {
     return poliza.map((el) => {
         const data = {
             id: el.id,
             policyNum: el.policyNum,
             risk: el.Risk,
             insuredValue: el.insuredValue,
-            Acciones: list(el.id).map((item, index) => (
+            Acciones: list(el.id, user, router).map((item, index) => (
                 <ActionRow {...item} key={index} />
             )),
         };
