@@ -15,7 +15,7 @@ export function getSelectPolizaData(register, errors, classes, polizas = null) {
             register,
             errors,
             name: 'clientId',
-            text: "Clientes",
+            text: "Cliente",
             defaultValue : polizas?.ClientHasPolicies[0].clientId
         },
         {
@@ -24,11 +24,20 @@ export function getSelectPolizaData(register, errors, classes, polizas = null) {
             register,
             errors,
             name: 'agentId',
-            text: "Agentes",
+            text: "Agente",
             defaultValue : polizas?.AgentContracts[0].agentId
         },
         {
             id: 31,
+            classes,
+            register,
+            errors,
+            name: 'relationId',
+            text: "Relacion de cliente a poliza",
+            defaultValue : polizas?.ClientHasPolicies[0].relationId
+        },
+        {
+            id: 32,
             classes,
             register,
             errors,
@@ -37,31 +46,22 @@ export function getSelectPolizaData(register, errors, classes, polizas = null) {
             defaultValue : polizas?.policyStatusId
         },
         {
-            id: 32,
-            classes,
-            register,
-            errors,
-            name: 'relationId',
-            text: "Relacion a poliza",
-            defaultValue : polizas?.ClientHasPolicies[0].relationId
-        },
-        {
             id: 33,
             classes,
             register,
             errors,
             name: 'periodicityId',
-            text: "Periodicidad",
-            defaultValue : polizas?.ClientHasPolicies[0].ClientHasTaker[0].PolicyDetails[0].periodicityId
+            text: "Periodicidad de Pago",
+            defaultValue : polizas?.PolicyDetails[0].periodicityId
         },
-        {
-            id: 34,
-            classes,
-            register,
-            errors,
-            name: 'currencyId',
-            text: "Moneda",
-            defaultValue: polizas?.ClientHasPolicies[0].ClientHasTaker[0].PolicyDetails[0].currencyId
-        }
+        // {
+        //     id: 34,
+        //     classes,
+        //     register,
+        //     errors,
+        //     name: 'currencyId',
+        //     text: "Moneda",
+        //     defaultValue: polizas?.ClientHasPolicies[0].ClientHasTaker[0].PolicyDetails[0].currencyId
+        // }
     ]
 }

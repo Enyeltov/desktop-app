@@ -1,18 +1,10 @@
 import { config } from "../../../../configs";
-import Table from "../../../components/Table/Table";
-import TableBody from "../../../components/Table/TableBody";
-import TableHead from "../../../components/Table/TableHead";
-import TableRow from "../../../components/Table/TableRow";
 import Layout from "../../../components/Layout/Layout";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
-import Link from "next/link";
-import ActionRow from "../../../components/Table/Row/ActionRow";
-import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import Modal from "../../../components/Modal/Modal";
 import {
   fileteredDocumentTypeData,
   getAgentGeneralData,
@@ -22,15 +14,14 @@ import SelectGroup from "../../../components/forms/SelectGroup";
 import { getPersonInputData } from "../../../data/persona/inputs";
 import { fileteredData } from "../../../features/policies";
 import { getPersonSelectData } from "../../../data/persona/selects";
-import { deleteRegistry, getAge } from "../../../features/utils";
+import { updateRegistry } from "../../../features/utils";
 import Loader from "../../../components/Loader/Loader";
 import { personSchema } from "../../../data/persona/schema";
-import { ipcRenderer } from "electron";
 import InputGroup from "../../../components/forms/InputGroup";
 
 const schema = personSchema();
 
-export default function Agentes() {
+export default function UpdateAgentes() {
   const [loading, setLoading] = useState(true);
   const [agente, setAgente] = useState({
     agentes: null,
@@ -102,6 +93,8 @@ export default function Agentes() {
   const data = getPersonInputData(register, errors, classes, agentes);
   const generalSelectData = getPersonSelectData(register, errors, classes, agentes);
 
+  console.log(agentes, 'this is a test');
+
   const documentTypeInput = {
     id: 4,
     name: "documentTypeId",
@@ -109,7 +102,7 @@ export default function Agentes() {
     errors,
     text: "Tipo de Documento",
     classes,
-    defaultValue: agentes ? agentes.Persons.documentTypeId : null
+    defaultValue: agentes ? agentes.Persons.documentTypeId : 'default'
   };
 
   // const documentTypeSelect = (
@@ -139,7 +132,7 @@ export default function Agentes() {
 
   function onSubmit(data) {
     console.log(data, 'submitData');
-    updateAgent(user, router, config, data, agentId)
+    updateRegistry(user, router, config, data, agentId, '/agents')
         .then(response => {
             console.log(response);
             if (response) {
@@ -156,7 +149,7 @@ export default function Agentes() {
 
   return (
     <>
-      <Layout title="Actualizar Agente">
+      <Layout title="Actualizar Agente" user = {user}>
 
             <form onSubmit={handleSubmit(onSubmit)} className=" w-full bg-white p-16">
                 <div className="grid gap-6 mb-6 lg:grid-cols-2">

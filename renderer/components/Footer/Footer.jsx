@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Footer() {
     return (
-        <footer className="p-4 bg-bga-blue">
+        <footer className="p-4 bg-bga-light-blue">
     <div className="md:flex md:justify-between">
         <div className="mb-6 md:mb-0">
             <a href="#" target="_blank" className="flex items-center space-x-2">

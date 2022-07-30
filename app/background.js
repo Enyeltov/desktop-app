@@ -266,6 +266,18 @@ function createWindow(windowName, options) {
   electron__WEBPACK_IMPORTED_MODULE_11__.ipcMain.handle("showDialog", (e, message) => {
     electron__WEBPACK_IMPORTED_MODULE_11__.dialog.showErrorBox('Error en datos ingresados', message);
   });
+  electron__WEBPACK_IMPORTED_MODULE_11__.ipcMain.handle("showConfirmation", async (e, message) => {
+    let option = {
+      buttons: ["Yes", "No"],
+      message: message,
+      title: "Confirmar",
+      type: "question",
+      cancelId: 1
+    };
+    let window = e.sender.getOwnerBrowserWindow();
+    let result = await electron__WEBPACK_IMPORTED_MODULE_11__.dialog.showMessageBox(window, option);
+    return result;
+  });
   return win;
 }
 ;

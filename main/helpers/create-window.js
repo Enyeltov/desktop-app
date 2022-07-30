@@ -84,5 +84,18 @@ export default function createWindow(windowName, options) {
     dialog.showErrorBox( 'Error en datos ingresados', message)
   })
 
+  ipcMain.handle("showConfirmation", async (e, message) => {
+    let option = {
+      buttons: ["Yes","No"],
+      message: message,
+      title: "Confirmar",
+      type: "question",
+      cancelId: 1,
+     }
+     let window = e.sender.getOwnerBrowserWindow()
+     let result = await dialog.showMessageBox(window, option)
+     return result
+  })
+
   return win;
 };

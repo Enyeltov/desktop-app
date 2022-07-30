@@ -1,3 +1,5 @@
+import { ipcRenderer } from "electron";
+
 export function fileteredData(data) {
     return data.map(el => {
         return {
@@ -108,7 +110,7 @@ export async function updatePolicy(user, router, config, serviceRoute, data, pol
     console.log(requestOptions, 'requestOptions');
 
     try {
-        const response = await fetch(`${apiUrl}/policies/${serviceRoute}/${polizaId}`, requestOptions);
+        const response = await fetch(`${apiUrl}/policies${serviceRoute}/${polizaId}`, requestOptions);
         if (response.status === 201) {
             const data = await response.json();
             return data

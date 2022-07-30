@@ -4,195 +4,201 @@ import TableBody from "../../components/Table/TableBody";
 import TableHead from "../../components/Table/TableHead";
 import TableRow from "../../components/Table/TableRow";
 import Layout from "../../components/Layout/Layout";
-import { useState } from "react";
-import Modal from "../../components/Modal/Modal";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import ActionRow from "../../components/Table/Row/ActionRow";
 import * as yup from "yup";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import Modal from "../../components/Modal/Modal";
+import {
+  fileteredDocumentTypeData,
+  getAgentGeneralData,
+} from "../../features/agent";
+import SelectGroup from "../../components/forms/SelectGroup";
+import { getPersonInputData } from "../../data/persona/inputs";
+import { fileteredData } from "../../features/policies";
+import { getPersonSelectData } from "../../data/persona/selects";
+import { deleteRegistry, getAge } from "../../features/utils";
+import Loader from "../../components/Loader/Loader";
+import { personSchema } from "../../data/persona/schema";
+import { ipcRenderer } from "electron";
 
-const schema = yup
-  .object({
-    email: yup.string().email("Email no valido").required("Email Requerido"),
-    name: yup.string().required("El nombre es requerido"),
-    lastName: yup.string().required("El apellido es requerido"),
-    civilPolicyStatus: yup.string(),
-    company: yup.string(),
-    birthDate: yup.date().required("La Fecha de Nacimiento es Requerida"),
-    document: yup.number().required("El documento es Requerido"),
-    documentTypeId: yup.number().required("El documento es Requerido"),
-    phone: yup.string(),
-  })
-  .required();
+const schema = personSchema();
 
-export default function Clientes({ clients, names }) {
+export default function Clientes() {
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [cliente, setCliente] = useState({
+    clientes: null,
+    names: null,
+    token: null,
+  });
+
+  const [documentType, setDocumentType] = useState({
+    value: "",
+    optionName: "",
+  });
+  const [generalSelects, setgeneralSelects] = useState({
+    value: "",
+    optionName: "",
+  });
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
   } = useForm({
+    mode: "onBlur",
     resolver: yupResolver(schema),
   });
 
-  const data = [
+  const classes = {
+    label: "text-sm font-medium text-gray-900 block mb-2",
+    input:
+      "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
+    div: "col-span-6 sm:col-span-3",
+    select:
+      "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
+    error: "text-red-500 text-sm font-normal mb-2",
+  };
+
+  const user = useSelector((state) => state.users);
+  const router = useRouter();
+
+  useEffect(() => {
+    async function fetchClientes() {
+      console.log(user, "user");
+      if (!user.token) {
+        router.push("/auth");
+      }
+
+      const head = [
+        "ID",
+        "Nombre",
+        "Documento",
+        "Genero",
+        "Edad",
+        "Acciones"
+      ];
+      const data = await getClient(user.token, user, router);
+      const clientes = filteredClientData(data, user, router);
+
+      setCliente({
+        names: head,
+        clientes,
+        token: user.token,
+      });
+      setLoading(false);
+    }
+    fetchClientes();
+    getAgentGeneralData(
+      user,
+      router,
+      config,
+      "document-types",
+      fileteredDocumentTypeData
+    ).then((value) => setDocumentType(value));
+    getAgentGeneralData(user, router, config, "cities", fileteredData).then(
+      (value) => setgeneralSelects(value)
+    );
+  }, []);
+
+  const { clientes, names, token } = cliente;
+
+  const clientData = [
     {
-      id: 1,
-      name: "email",
-      type: "email",
-      placeholder: "Email",
-      register,
-      errors,
-      text: "Correo Electronico",
-      classes: {
-        label: "text-sm font-medium text-gray-900 block mb-2",
-        input:
-          "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
-        div: "col-span-6 sm:col-span-3",
-      },
-    },
-    {
-      id: 2,
-      name: "name",
-      type: "text",
-      placeholder: "Jose Carlos",
-      register,
-      errors,
-      text: "Nombres",
-      classes: {
-        label: "text-sm font-medium text-gray-900 block mb-2",
-        input:
-          "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
-        div: "col-span-6 sm:col-span-3",
-      },
-    },
-    {
-      id: 3,
-      name: "lastName",
-      type: "text",
-      placeholder: "Duarte Molinas",
-      register,
-      errors,
-      text: "Apellidos",
-      classes: {
-        label: "text-sm font-medium text-gray-900 block mb-2",
-        input:
-          "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
-        div: "col-span-6 sm:col-span-3",
-      },
-    },
-    {
-      //tranformar esto en un select
-      id: 4,
-      name: "documentTypeId",
-      type: "text",
-      placeholder: "1",
-      register,
-      errors,
-      text: "Tipo de Documento",
-      classes: {
-        label: "text-sm font-medium text-gray-900 block mb-2",
-        input:
-          "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
-        div: "col-span-6 sm:col-span-3",
-      },
-    },
-    {
-      id: 5,
-      name: "document",
-      type: "text",
-      placeholder: "14616646",
-      register,
-      errors,
-      text: "Documento",
-      classes: {
-        label: "text-sm font-medium text-gray-900 block mb-2",
-        input:
-          "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
-        div: "col-span-6 sm:col-span-3",
-      },
-    },
-    {
-      id: 6,
-      name: "birthDate",
-      type: "date",
-      placeholder: "01-10-14",
-      register,
-      errors,
-      text: "Fecha de Nacimiento",
-      classes: {
-        label: "text-sm font-medium text-gray-900 block mb-2",
-        input:
-          "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
-        div: "col-span-6 sm:col-span-3",
-      },
-    },
-    {
-      id: 7,
-      name: "phone",
-      type: "text",
-      placeholder: "0414779865",
-      register,
-      errors,
-      text: "Telefono",
-      classes: {
-        label: "text-sm font-medium text-gray-900 block mb-2",
-        input:
-          "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
-        div: "col-span-6 sm:col-span-3",
-      },
-    },
-    {
-      id: 8,
+      id: 18,
       name: "company",
       type: "text",
-      placeholder: "Enyel y los otros",
+      placeholder: "",
       register,
       errors,
-      text: "Compania",
-      classes: {
-        label: "text-sm font-medium text-gray-900 block mb-2",
-        input:
-          "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
-        div: "col-span-6 sm:col-span-3",
-      },
+      text: "Compañia",
+      classes,
     },
     {
-      id: 9,
-      name: "civilPolicyStatus",
-      type: "text",
-      placeholder: "Soltero",
-      register,
-      errors,
-      text: "Estado Civil",
-      classes: {
-        label: "text-sm font-medium text-gray-900 block mb-2",
-        input:
-          "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
-        div: "col-span-6 sm:col-span-3",
-      },
-    },
-    {
-      id: 10,
+      id: 19,
       name: "ocupation",
       type: "text",
-      placeholder: "Dev",
+      placeholder: "",
       register,
       errors,
-      text: "Ocupacion",
-      classes: {
-        label: "text-sm font-medium text-gray-900 block mb-2",
-        input:
-          "shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5",
-        div: "col-span-6 sm:col-span-3",
-      },
+      text: "Ocupación",
+      classes,
     },
+  ]
+
+  const data = getPersonInputData(register, errors, classes);
+  data.push(...clientData);
+  const generalSelectData = getPersonSelectData(register, errors, classes);
+  generalSelectData.push({
+    id: 24,
+    name: 'civilPolicyStatus',
+    register,
+    errors,
+    text: 'Estado civil',
+    classes,
+    defaultValue: 'default'
+  });
+
+  const documentTypeInput = {
+    id: 4,
+    name: "documentTypeId",
+    register,
+    errors,
+    text: "Tipo de Documento",
+    classes,
+    defaultValue: 'default'
+  };
+
+  const documentTypeSelect = (
+    <SelectGroup
+      optionData={documentType}
+      key={documentTypeInput.id}
+      {...documentTypeInput}
+    />
+  );
+  const generalSelect = [
+    <SelectGroup
+      optionData={[
+        { value: "Masculino", optionName: "Masculino" },
+        { value: "Femenino", optionName: "Femenino" },
+      ]}
+      key={generalSelectData[0].id}
+      {...generalSelectData[0]}
+    />,
   ];
+  generalSelect.push(
+    <SelectGroup
+      optionData={generalSelects}
+      key={generalSelectData[1].id}
+      {...generalSelectData[1]}
+    />
+  );
+  generalSelect.push(
+    <SelectGroup
+      optionData={[
+        { value: "Soltero", optionName: "Soltero" },
+        { value: "Casado", optionName: "Casado" },
+        { value: "Divorciado", optionName: "Divorciado" },
+        { value: "Viudo", optionName: "Viudo" },
+      ]}
+      key={generalSelectData[2].id}
+      {...generalSelectData[2]}
+    />
+  );
+
+
+  if (loading) {
+    return <Loader/>;
+  }
 
   return (
     <>
-      {/* <Layout title={polizas.title}> */}
-      <Layout title="Clientes">
+      <Layout title="Gestionar Clientes" user = {user}>
         <div className="p-4 block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5">
           <div className="flex items-center space-x-2 sm:space-x-3 ml-auto">
             <button
@@ -201,7 +207,7 @@ export default function Clientes({ clients, names }) {
               }}
               type="button"
               data-modal-toggle="add-user-modal"
-              className="w-1/2 text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto"
+              className="w-1/2 text-white bg-bga-light-blue hover:bg-blue-800 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto"
             >
               <svg
                 className="-ml-1 mr-2 h-6 w-6"
@@ -217,31 +223,13 @@ export default function Clientes({ clients, names }) {
               </svg>
               Añadir Cliente
             </button>
-            <a
-              href="#"
-              className="w-1/2 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto"
-            >
-              <svg
-                className="-ml-1 mr-2 h-6 w-6"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-              Exportar
-            </a>
           </div>
         </div>
 
         <Table>
           <TableHead names={names} />
           <TableBody>
-            {clients.map((el) => {
+            {clientes.map((el) => {
               return (
                 <tr
                   key={el.id}
@@ -257,10 +245,19 @@ export default function Clientes({ clients, names }) {
         {showModal ? (
           <Modal
             setShowModal={setShowModal}
-            submitFunction={createClient}
+            submitFunction={async (data) => {
+              const newClient = await createClient(data, token, user, router);
+              setCliente({
+                ...cliente,
+                clientes: [...clientes, newClient],
+              });
+              return newClient;
+            }}
             handleSubmit={handleSubmit}
             data={data}
             title="Añadir Cliente"
+            beforeSelect={[documentTypeSelect]}
+            afterSelect={generalSelect}
           />
         ) : null}
       </Layout>
@@ -268,11 +265,8 @@ export default function Clientes({ clients, names }) {
   );
 }
 
-async function createClient(data) {
+async function createClient(data, token, user, router) {
   const apiUrl = config.apiUrl();
-
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIxLCJlbWFpbCI6Imd1aWxsZUBhZG1pbi5jb20iLCJpYXQiOjE2NTQ4NTEzMDQsImV4cCI6MTY1NDg1NDkwNH0.KjkzuugtnXjuItYLACdlbEq25zd63DzkR93pea-Lx4w";
 
   const myHeaders = new Headers();
   myHeaders.append("Authorization", `Bearer ${token}`);
@@ -287,19 +281,28 @@ async function createClient(data) {
   console.log(JSON.stringify(data), "1");
   try {
     const response = await fetch(`${apiUrl}/clients`, requestOptions);
+    if ((response.status === 200 || response.status === 201) && response.ok) {
     const data = await response.json();
     console.log(data, "2");
-    return filteredClientData(data);
+    return filteredClientCreateData(data, user, router);
+    } else {
+      throw response
+    }
   } catch (error) {
-    console.log(error);
-    return error;
+    error.json().then(body => {
+      console.log(body);
+      if (body.message instanceof Array){
+      ipcRenderer.invoke('showDialog', ...body.message)
+      } else {
+      ipcRenderer.invoke('showDialog', body.message)
+      }            
+    })
+    return false;
   }
 }
 
-async function getClients() {
+async function getClient(token) {
   const apiUrl = config.apiUrl();
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIxLCJlbWFpbCI6Imd1aWxsZUBhZG1pbi5jb20iLCJpYXQiOjE2NTQ4NTEzMDQsImV4cCI6MTY1NDg1NDkwNH0.KjkzuugtnXjuItYLACdlbEq25zd63DzkR93pea-Lx4w";
 
   const myHeaders = new Headers();
   myHeaders.append("Authorization", `Bearer ${token}`);
@@ -313,55 +316,65 @@ async function getClients() {
   try {
     const response = await fetch(`${apiUrl}/clients`, requestOptions);
     const data = await response.json();
-    return filteredClientData(data);
+    console.log(data, "data");
+    return data;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return;
   }
 }
 
-const onSubmit = (data) => {
-  registerUser(data)
-    .then((res) => {
-      console.log(res);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
+const list = (id, personId, user, router) => [
+  {
+    link: `/clientes/${id}`,
+    image: "/images/watch.svg",
+  },
+  {
+    link: `/clientes/update/${id}`,
+    image: "/images/update.svg",
+  },
+  {
+    link: `#`,
+    image: "/images/delete.svg",
+    handleClick: async (e) => {
+      e.preventDefault();
+      console.log("delete", personId);
+      const confirm = await ipcRenderer.invoke('showConfirmation', '¿Desea eliminar este registro?')
+      if (confirm.response === 0){
+      deleteRegistry(user, router, config, personId, '/clients')
+    }
+    },
+  },
+];
 
-function filteredClientData(client) {
+function filteredClientData(client, user, router) {
   return client.map((el) => {
     const data = {
       id: el.id,
       fullName: `${el.Persons.name} ${el.Persons.lastName}`,
-      document: `${el.Persons.documentTypeId} ${el.Persons.document}`,
+      document: `${el.Persons.documentTypeId == 1 ? 'V-' : 'J-'}${el.Persons.document}`,
       gender: el.Persons.gender,
-      birthDate: el.Persons.birthDate,
-      company: el.company,
-      ocupation: el.ocupation,
+      birthDate: getAge(el.Persons.birthDate),
+      Acciones: list(el.id, el.Persons.id, user, router).map((item, index) => (
+        <ActionRow {...item} key={index} />
+      )),
     };
+    console.log(data, 'data');
     return data;
   });
 }
 
-export async function getServerSideProps(context) {
-  const head = [
-    "ID",
-    "Nombre",
-    "Documento",
-    "Genero",
-    "Fecha De Nacimiento",
-    "Company",
-    "Ocupacion",
-  ];
-
-  const clients = await getClients();
-
-  return {
-    props: {
-      names: head,
-      clients,
-    }, // will be passed to the page component as props
+function filteredClientCreateData(client, user, router) {
+  const data = {
+    id: client.Clients[0].id,
+    fullName: `${client.name} ${client.lastName}`,
+    document: `${client.documentTypeId == 1 ? 'V-' : 'J-'}${client.document}`,
+    gender: client.gender,
+    birthDate: getAge(client.birthDate),
+    Acciones: list(client.Clients[0].id, client.id, user, router).map((item, index) => (
+      <ActionRow {...item} key={index} />
+    )),
   };
+  console.log(data, 'data');
+  return data;
 }

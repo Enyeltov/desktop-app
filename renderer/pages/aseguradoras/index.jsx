@@ -7,22 +7,17 @@ import Layout from "../../components/Layout/Layout";
 import { useEffect, useState } from "react";
 import Modal from "../../components/Modal/Modal";
 import { useForm } from "react-hook-form";
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import Loader from "../../components/Loader/Loader";
+import { deleteRegistry } from "../../features/utils";
+import ActionRow from "../../components/Table/Row/ActionRow";
+import { getInsuranceCarrierData } from "../../data/aseguradoras/inputs";
+import { insuranceCarrierSchema } from "../../data/aseguradoras/schema";
+import { ipcRenderer } from "electron";
 
-const schema = yup
-  .object({
-    email: yup.string().email("Email no valido"),
-    name: yup.string().required("La contrasena es requerida"),
-    document: yup.number().required("El Rif es Requerido"),
-    phone: yup.string(),
-    account: yup.string(),
-    paymentLink: yup.string(),
-  })
-  .required();
+const schema = insuranceCarrierSchema();
 
 export default function Aseguradoras() {
   const [showModal, setShowModal] = useState(false);
@@ -51,68 +46,7 @@ export default function Aseguradoras() {
     error: "text-red-500 text-sm font-normal mb-2",
   };
 
-  const data = [
-    {
-      id: 1,
-      name: "document",
-      type: "text",
-      placeholder: "",
-      register,
-      errors,
-      text: "RIF de la Empresa",
-      classes
-    },
-    {
-      id: 2,
-      name: "name",
-      type: "text",
-      placeholder: "",
-      register,
-      errors,
-      text: "Nombre de la Empresa",
-      classes
-    },
-    {
-      id: 3,
-      name: "email",
-      type: "email",
-      placeholder: "",
-      register,
-      errors,
-      text: "Correo Electronico",
-      classes
-    },
-    {
-      id: 4,
-      name: "phone",
-      type: "text",
-      placeholder: "",
-      register,
-      errors,
-      text: "Telefono",
-      classes
-    },
-    {
-      id: 5,
-      name: "account",
-      type: "text",
-      placeholder: "",
-      register,
-      errors,
-      text: "Cuenta Bancaria",
-      classes
-    },
-    {
-      id: 6,
-      name: "paymentLink",
-      type: "text",
-      placeholder: "",
-      register,
-      errors,
-      text: "Link de Pago",
-      classes
-    },
-  ];
+  const data = getInsuranceCarrierData(register, errors, classes);
   const user = useSelector((state) => state.users);
   const router = useRouter()
 
@@ -126,10 +60,12 @@ export default function Aseguradoras() {
       const head = [
         "ID",
         "Nombre",
-        "Documento",
+        "RIF",
         "Correo Electronico",
+        "Telefono",
+        "Acciones"
       ];
-      const insuranceCarriers = await getInsuranceCarrier(user.token);
+      const insuranceCarriers = await getInsuranceCarrier(user.token, user, router);
 
       setInsuranceCarrier({
         names: head,
@@ -149,8 +85,7 @@ export default function Aseguradoras() {
 
   return (
     <>
-      {/* <Layout title={polizas.title}> */}
-      <Layout title="Aseguradoras">
+      <Layout title="Gestionar Aseguradoras" user = {user}>
         <div className="p-4 block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5">
           <div className="flex items-center space-x-2 sm:space-x-3 ml-auto">
             <button
@@ -159,7 +94,7 @@ export default function Aseguradoras() {
               }}
               type="button"
               data-modal-toggle="add-user-modal"
-              className="w-1/2 text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto"
+              className="w-1/2 text-white bg-bga-light-blue hover:bg-blue-800 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto"
             >
               <svg
                 className="-ml-1 mr-2 h-6 w-6"
@@ -175,27 +110,9 @@ export default function Aseguradoras() {
               </svg>
               Añadir Aseguradora
             </button>
-            <a
-              href="#"
-              className="w-1/2 text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-cyan-200 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto"
-            >
-              <svg
-                className="-ml-1 mr-2 h-6 w-6"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-              Exportar
-            </a>
           </div>
         </div>
-
+              {console.log(insuranceCarriers, "insuranceCarriers")}
         <Table>
           <TableHead names={names} />
           <TableBody>
@@ -216,7 +133,7 @@ export default function Aseguradoras() {
           <Modal
             setShowModal={setShowModal}
             submitFunction={async (data) => {
-              const newInsuranceCarrier = await createInsuranceCarrier(data,token)
+              const newInsuranceCarrier = await createInsuranceCarrier(data,token, user, router)
               console.log(newInsuranceCarrier, "newInsuranceCarrier");
               setInsuranceCarrier({
                 ...insuranceCarrier,
@@ -235,7 +152,7 @@ export default function Aseguradoras() {
   );
 }
 
-async function createInsuranceCarrier(data, token) {
+async function createInsuranceCarrier(data, token, user, router) {
   const apiUrl = config.apiUrl();
 
   const myHeaders = new Headers();
@@ -251,21 +168,37 @@ async function createInsuranceCarrier(data, token) {
   console.log(JSON.stringify(data), "1");
   try {
     const response = await fetch(`${apiUrl}/insurance-carrier`, requestOptions);
-    const data = await response.json();
-    console.log(data, "2");
-    return {
-      id: data.id,
-      companyName: data.name,
-      document: `j-${data.document}`,
-      email: data.email,
-    };
+    if (response.status === 200 || response.status === 201){
+      const data = await response.json();
+      console.log(data, "2");
+      return {
+        id: data.id,
+        companyName: data.name,
+        document: `j-${data.document}`,
+        email: data.email,
+        phone : data.phone,
+        Acciones: list(data.id, user, router).map((item, index) => (
+          <ActionRow {...item} key={index} />
+        )),
+      };
+    } else {
+      if (response.status >= 400) {
+        console.log(response);
+        throw response;
+      } else {
+        return false;
+      }
+    }
   } catch (error) {
     console.log(error);
-    return error;
+    error.json().then((body) => {
+      ipcRenderer.invoke("showDialog", body.message);
+    });
+    return false;
   }
 }
 
-async function getInsuranceCarrier(token) {
+async function getInsuranceCarrier(token, user, router) {
   const apiUrl = config.apiUrl();
 
   const myHeaders = new Headers();
@@ -280,7 +213,7 @@ async function getInsuranceCarrier(token) {
   try {
     const response = await fetch(`${apiUrl}/insurance-carrier`, requestOptions);
     const data = await response.json();
-    return filteredInsuranceCarrierData(data);
+    return filteredInsuranceCarrierData(data, user, router);
   } catch (error) {
     console.log(error);
     return;
@@ -297,13 +230,40 @@ const onSubmit = (data) => {
     });
 };
 
-function filteredInsuranceCarrierData(insuranceCarrier) {
+const list = (id, user, router) => [
+  {
+    link: `/aseguradoras/${id}`,
+    image: "/images/watch.svg",
+  },
+  {
+    link: `/aseguradoras/update/${id}`,
+    image: "/images/update.svg",
+  },
+  {
+    link: `#`,
+    image: "/images/delete.svg",
+    handleClick: async (e) => {
+      e.preventDefault();
+      console.log("delete", id);
+      const confirm = await ipcRenderer.invoke('showConfirmation', '¿Desea eliminar este registro?')
+      if (confirm.response === 0){
+      deleteRegistry(user, router, config, id, '/insurance-carrier')
+    }
+    },
+  },
+];
+
+function filteredInsuranceCarrierData(insuranceCarrier, user, router) {
   return insuranceCarrier.map((el) => {
     const data = {
       id: el.id,
       companyName: el.name,
       document: `j-${el.document}`,
       email: el.email,
+      phone : el.phone,
+      Acciones: list(el.id, user, router).map((item, index) => (
+        <ActionRow {...item} key={index} />
+      )),
     };
     return data;
   });

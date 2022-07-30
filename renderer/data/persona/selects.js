@@ -7,7 +7,7 @@ export function getPersonSelectData(register, errors, classes, data) {
                 errors,
                 name: 'gender',
                 text: "Genero",
-                defaultValue: data ? data.Persons.gender : null
+                defaultValue: data ? data.Persons.gender : 'default'
             },
             {
                 id: 11,
@@ -16,7 +16,7 @@ export function getPersonSelectData(register, errors, classes, data) {
                 errors,
                 name: 'cityId',
                 text: "Ciudad de Residencia",
-                defaultValue: data ? data.Persons.Addresses.cityId : null
+                defaultValue: data ? data.Persons.Addresses ? data.Persons.AddressescityId : 'default' : 'default'
             }
     ]
 }

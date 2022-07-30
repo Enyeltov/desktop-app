@@ -1,5 +1,5 @@
 export default function InputGroup({ name, type, placeholder, text, register, validate, errors, classes, value = undefined, defaultValue = undefined, checked = null, disabled = false, pattern = null }) {
-  console.log(defaultValue, 'defaultValue');
+  console.log('name:', name, 'defaultValue:', defaultValue, typeof(defaultValue));
   return (
     <div className={classes.div}>
       <label

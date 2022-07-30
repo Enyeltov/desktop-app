@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { ipcRenderer } from 'electron';
 import { config } from '../../configs';
 const initialState = {
-    user: null,
+    data: null,
     error: null,
     token: null,
     loading: 'idle',
@@ -86,6 +86,7 @@ const usersSlice = createSlice({
                     state.currentRequestId === requestId
                 ) {
                     state.loading = 'idle'
+                    state.data = action.payload.Users
                     state.token = action.payload.access_token
                 }
             })

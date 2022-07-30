@@ -21,24 +21,25 @@ import InputGroup from "../../components/forms/InputGroup";
 
 const schema = personSchema();
 
-export default function Agentes() {
+export default function WatchAgentes() {
   const [loading, setLoading] = useState(true);
   const [agente, setAgente] = useState({
     agentes: null,
     token: null,
   });
-  const [documentType, setDocumentType] = useState({
+  const [documentType, setDocumentType] = useState([{
     value: "",
     optionName: "",
-  });
-  const [generalSelects, setgeneralSelects] = useState({
+  }]);
+  const [generalSelects, setgeneralSelects] = useState([{
     value: "",
     optionName: "",
-  });
+  }]);
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm({
     mode: "onBlur",
@@ -63,7 +64,6 @@ export default function Agentes() {
         agentes,
         token: user.token,
       });
-      setLoading(false);
     }
     fetchAgentes();
     getAgentGeneralData(
@@ -76,6 +76,7 @@ export default function Agentes() {
     getAgentGeneralData(user, router, config, "cities", fileteredData).then(
       (value) => setgeneralSelects(value)
     );
+    setLoading(false);
   }, []);
 
   const {agentes, token} = agente
@@ -92,6 +93,8 @@ export default function Agentes() {
   const data = getPersonInputData(register, errors, classes, agentes);
   const generalSelectData = getPersonSelectData(register, errors, classes, agentes);
 
+  console.log(agentes, 'this is a test');
+
   const documentTypeInput = {
     id: 4,
     name: "documentTypeId",
@@ -99,36 +102,33 @@ export default function Agentes() {
     errors,
     text: "Tipo de Documento",
     classes,
-    defaultValue: agentes ? agentes.Persons.documentTypeId : null
+    defaultValue: agentes ? agentes.Persons.documentTypeId : 'default'
   };
 
-  const documentTypeSelect = (
-    <SelectGroup
-      optionData={documentType}
-      disabled={true}
-      key={documentTypeInput.id}
-      {...documentTypeInput}
-    />
-  );
-  const generalSelect = [
-    <SelectGroup
-      optionData={[
-        { value: "Masculino", optionName: "Masculino" },
-        { value: "Femenino", optionName: "Femenino" },
-      ]}
-      disabled={true}
-      key={generalSelectData[0].id}
-      {...generalSelectData[0]}
-    />,
-  ];
-  generalSelect.push(
-    <SelectGroup
-      optionData={generalSelects}
-      disabled={true}
-      key={generalSelectData[1].id}
-      {...generalSelectData[1]}
-    />
-  );
+  // const documentTypeSelect = (
+  //   <SelectGroup
+  //     optionData={documentType}
+  //     key={documentTypeInput.id}
+  //     {...documentTypeInput}
+  //   />
+  // );
+  // const generalSelect = [
+  //   <SelectGroup
+  //     optionData={[
+  //       { value: "Masculino", optionName: "Masculino" },
+  //       { value: "Femenino", optionName: "Femenino" },
+  //     ]}
+  //     key={generalSelectData[0].id}
+  //     {...generalSelectData[0]}
+  //   />,
+  // ];
+  // generalSelect.push(
+  //   <SelectGroup
+  //     optionData={generalSelects}
+  //     key={generalSelectData[1].id}
+  //     {...generalSelectData[1]}
+  //   />
+  // );
 
   function onSubmit(data) {
     console.log(data, 'submitData');
@@ -149,17 +149,34 @@ export default function Agentes() {
 
   return (
     <>
-      <Layout title="Actualizar Agente">
+      <Layout title="Actualizar Agente" user = {user}>
 
             <form onSubmit={handleSubmit(onSubmit)} className=" w-full bg-white p-16">
                 <div className="grid gap-6 mb-6 lg:grid-cols-2">
-                    {documentTypeSelect}
+                    <SelectGroup
+                      disabled = {true}
+                      optionData={documentType}
+                      key={documentTypeInput.id}
+                      {...documentTypeInput}
+                    />
                     {data.map(input => {
-                        return <InputGroup  disabled={true} key={input.id} {...input} />
+                        return <InputGroup disabled = {true} key={input.id} {...input} />
                     })}
-                    {generalSelect.map(select => {
-                        return select
-                    })}
+                    <SelectGroup
+                      disabled = {true}
+                      optionData={[
+                        { value: "Masculino", optionName: "Masculino" },
+                        { value: "Femenino", optionName: "Femenino" },
+                      ]}
+                      key={generalSelectData[0].id}
+                      {...generalSelectData[0]}
+                    />
+                    <SelectGroup
+                      disabled = {true}
+                      optionData={generalSelects}
+                      key={generalSelectData[1].id}
+                      {...generalSelectData[1]}
+                    />
                 </div>
                 <button type="button" onClick={() => router.push('/agentes')} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 mx-1">Regresar</button>
             </form>

@@ -12,7 +12,7 @@ const schema = yup.object({
 }).required();
 
 const prefilledValue = {
-    email: 'guille@admin.com',
+    email: 'enyeltov@admin.com',
     password: '123456'
 };
 
@@ -60,7 +60,7 @@ export default function Login({ setIsLogin }) {
         dispatch(login(data)).then((result) => {
             console.log(result);
             if (result.type === "users/login/fulfilled"){
-            router.push('/polizas')
+            router.push('/dashboard')
             }
         }).catch((err) => {
             console.log(err);
@@ -81,13 +81,13 @@ export default function Login({ setIsLogin }) {
                 })}
                 <div className="flex items-center justify-between">
                     <button className="px-4 py-2 rounded text-white inline-block shadow-lg bg-blue-500 hover:bg-blue-600 focus:bg-blue-700" type="submit">Ingresar</button>
-                    <a
+                    {/* <a
                         className="inline-block align-baseline font-normal text-sm text-blue-500 hover:text-blue-800"
                         href="#"
                     >
                         ¿Olvido su contraseña?
                     </a>
-                    <a className="inline-block align-baseline font-normal text-sm text-blue-500 hover:text-blue-800" href="#" onClick={() => setIsLogin(false)} > Registrarse </a>
+                    <a className="inline-block align-baseline font-normal text-sm text-blue-500 hover:text-blue-800" href="#" onClick={() => setIsLogin(false)} > Registrarse </a> */}
                 </div>
             </form>
         </>

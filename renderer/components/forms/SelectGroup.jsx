@@ -6,8 +6,6 @@ export default function SelectGroup({ name, text, optionData, register, validate
 
     // const DV = defaultValue ? defaultValue.toString() : undefined;
     // console.log({defaultValue: DV, name: name});
-    console.log(optionData, 'optionData');
-
     return (
         <div className={classes.div}>
             <label
@@ -26,7 +24,7 @@ export default function SelectGroup({ name, text, optionData, register, validate
                 {/* the first option should be a disabled tooltip  */}
                 <option disabled value='default' >Selecciona una opción</option>
                 {optionData.map(el => {
-                    return <option value={el.value} > {el.optionName}</option>
+                    return <option selected = {el.value === defaultValue ? true : false} value={el.value} > {el.optionName}</option>
                 })}
                 
             </select>

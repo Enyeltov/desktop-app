@@ -17,6 +17,7 @@ module.exports = {
       colors:{
         'bga-blue': '#252644',
         'bga-light-blue': '#334E96',
+        'whitesmoke': '#f5f5f5',
       },
     },
   },

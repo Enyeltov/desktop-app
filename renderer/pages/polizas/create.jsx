@@ -66,7 +66,7 @@ export default function CreatePoliza() {
     const selectSubBranchData = {
         classes,
         name: 'subBranchId',
-        text: 'Sub Ramo',
+        text: 'Ramo de Seguro',
         register,
         // validate,
         errors
@@ -74,26 +74,26 @@ export default function CreatePoliza() {
     // diferentes branchs
     const buttonsBranch = [
         {
-            buttonClass: 'w-1/2 text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto',
+            buttonClass: 'w-1/2 text-white bg-bga-light-blue hover:bg-blue-800 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto',
             onClickHandle: () => handleBranchChange('Vehiculos', 2),
             text: 'Vehiculos',
             image: '/images/car-insurance.svg'
             
         },
         {
-            buttonClass: 'w-1/2 text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto',
+            buttonClass: 'w-1/2 text-white bg-bga-light-blue hover:bg-blue-800 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto',
             onClickHandle: () => handleBranchChange('Viajes', 3),
             text: 'Viajes',
             image: '/images/travel-insurance.svg'
         },
         {
-            buttonClass: 'w-1/2 text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto',
+            buttonClass: 'w-1/2 text-white bg-bga-light-blue hover:bg-blue-800 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto',
             onClickHandle: () => handleBranchChange('Patrimoniales', 4),
             text: 'Patrimoniales',
             image: '/images/home-insurance.svg'
         },
         {
-            buttonClass: 'w-1/2 text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto',
+            buttonClass: 'w-1/2 text-white bg-bga-light-blue hover:bg-blue-800 focus:ring-4 focus:ring-blue-100 font-medium inline-flex items-center justify-center rounded-lg text-sm px-3 py-2 text-center sm:w-auto',
             onClickHandle: () => handleBranchChange('Personas', 1),
             text: 'Personas',
             image: '/images/health-insurance.svg'
@@ -211,7 +211,6 @@ export default function CreatePoliza() {
             getPoliciesGeneralData(user, router, config, 'policy-status', fileteredData),
             getPoliciesGeneralData(user, router, config, 'relation-policy-status', fileteredData),
             getPoliciesGeneralData(user, router, config, 'periodicities', fileteredData),
-            getPoliciesGeneralData(user, router, config, 'currencies', fileteredData),
         ]).then(value => {
             // console.log(value, "value");
             setgeneralSelects(value)
@@ -239,7 +238,7 @@ export default function CreatePoliza() {
 
     return (
         <>
-            <Layout title="Crear Poliza">
+            <Layout title="Crear Poliza" user = {user}>
                 <div className="p-4 block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5">
                     <div className="flex items-center space-x-2 sm:space-x-3 ml-auto">
                         {buttonsBranch.map((el, i) => <ButtonIcon key={i} {...el} />)}

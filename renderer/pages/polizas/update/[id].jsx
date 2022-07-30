@@ -24,7 +24,6 @@ export default function UpdatePoliza() {
         getValues,
         formState: { errors },
     } = useForm({
-        defaultValues: polizas,
         mode: 'onBlur',
         resolver: yupResolver(schema),
     });
@@ -112,7 +111,6 @@ export default function UpdatePoliza() {
             getPoliciesGeneralData(user, router, config, 'policy-status', fileteredData),
             getPoliciesGeneralData(user, router, config, 'relation-policy-status', fileteredData),
             getPoliciesGeneralData(user, router, config, 'periodicities', fileteredData),
-            getPoliciesGeneralData(user, router, config, 'currencies', fileteredData),
         ]).then(value => {
             setgeneralSelects(value)
         })
@@ -131,8 +129,8 @@ export default function UpdatePoliza() {
     const selectSubBranchData = {
         classes,
         name: 'subBranchId',
-        text: 'Sub Ramo',
-        selectedIndex: polizas?.subBranchId,
+        text: 'Ramo de Seguros',
+        defaultValue: polizas?.subBranchId,
         register,
         // validate,
         errors
@@ -196,10 +194,10 @@ export default function UpdatePoliza() {
     }
 
     const postStateMachine = {
-        Vehiculo: 'vehicle',
+        Vehiculo: '/vehicle',
         Persona: '',
-        Viaje: 'travel',
-        Patrimonial: 'patrimonial',
+        Viaje: '/travel',
+        Patrimonial: '/patrimonial',
     }
 
     function filterSubBranch(branchs) {
@@ -233,15 +231,6 @@ export default function UpdatePoliza() {
         }
     }
 
-    // se encarga de actualizar el form
-
-    // corre al principio y ya
-    
-
-    // useEffect(() => {
-        
-    // }, [poliza])
-
     function onSubmit(data) {
         console.log(data, "data");
         const serviceRoute = postStateMachine[polizas.BranchTypes.name]
@@ -267,7 +256,7 @@ export default function UpdatePoliza() {
     
     return (
         <>
-            <Layout title="Actualizar Poliza">
+            <Layout title="Actualizar Poliza" user = {user}>
                 
                 <form onSubmit={handleSubmit(onSubmit)} className=" w-full bg-white p-16">
                     <div className="grid gap-6 mb-6 lg:grid-cols-2">

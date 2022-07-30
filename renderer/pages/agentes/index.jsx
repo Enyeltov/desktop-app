@@ -74,6 +74,7 @@ export default function Agentes() {
     errors,
     text: "Tipo de Documento",
     classes,
+    defaultValue: agentes ? agentes.Persons.documentTypeId : 'default'
   };
 
   const user = useSelector((state) => state.users);
@@ -149,7 +150,7 @@ export default function Agentes() {
 
   return (
     <>
-      <Layout title="Agentes">
+      <Layout title="Gestionar Agentes" user = {user}>
         <div className="p-4 block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5">
           <div className="flex items-center space-x-2 sm:space-x-3 ml-auto">
             <button
@@ -235,7 +236,7 @@ async function createAgent(data, token, user, router) {
     if ((response.status === 200 || response.status === 201) && response.ok) {
     const data = await response.json();
     console.log(data, "2");
-    return filteredAgentData(data, user, router);
+    return filteredAgentCreateData(data, user, router);
     } else {
       throw response
     }
@@ -283,10 +284,13 @@ const list = (id, personId, user, router) => [
   {
     link: `#`,
     image: "/images/delete.svg",
-    handleClick: (e) => {
+    handleClick: async (e) => {
       e.preventDefault();
       console.log("delete", personId);
+      const confirm = await ipcRenderer.invoke('showConfirmation', '¿Desea eliminar este registro?')
+      if (confirm.response === 0) {
       deleteRegistry(user, router, config, personId, '/agents')
+      }
     },
   },
 ];
@@ -306,4 +310,19 @@ function filteredAgentData(agent, user, router) {
     console.log(data, 'data');
     return data;
   });
+}
+
+function filteredAgentCreateData(agent, user, router) {
+    const data = {
+      id: agent.Agents[0].id,
+      fullName: `${agent.name} ${agent.lastName}`,
+      document: `${agent.documentTypeId == 1 ? 'V-' : 'J-'}${agent.document}`,
+      gender: agent.gender,
+      birthDate: getAge(agent.birthDate),
+      Acciones: list(agent.Agents[0].id, agent.id, user, router).map((item, index) => (
+        <ActionRow {...item} key={index} />
+      )),
+    };
+    console.log(data, 'data');
+    return data;
 }

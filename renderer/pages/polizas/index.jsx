@@ -12,6 +12,7 @@ import ButtonIcon from "../../components/Buttons/ButtonIcon";
 import ActionRow from "../../components/Table/Row/ActionRow";
 import Loader from "../../components/Loader/Loader";
 import { deleteRegistry } from "../../features/utils";
+import { ipcRenderer } from "electron";
 
 
 export default function Polizas() {
@@ -52,6 +53,8 @@ export default function Polizas() {
                 "ID",
                 "Numero de Poliza",
                 "Riesgo",
+                "Aseguradora",
+                "Ramo",
                 "Valor Asegurado",
                 "Acciones",
             ];
@@ -75,7 +78,7 @@ export default function Polizas() {
 
     return (
         <>
-            <Layout title="Polizas">
+            <Layout title="Gestionar Polizas" user = {user}>
                 <div className="p-4 block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5">
                     <div className="flex items-center space-x-2 sm:space-x-3 ml-auto">
                         <Link href="/polizas/create">
@@ -190,10 +193,13 @@ const list = (id, user, router) => (
         {
             link: `#`,
             image: "/images/delete.svg",
-            handleClick: (e) => {
+            handleClick: async (e) => {
                 e.preventDefault();
                 console.log("delete", id);
+                const confirm = await ipcRenderer.invoke('showConfirmation', '¿Desea eliminar este registro?');
+                if (confirm.response === 0){
                 deleteRegistry(user, router, config, id, '/policies')
+            }
             }
         },
     ]
@@ -205,6 +211,9 @@ function filteredPoliza(poliza, user, router) {
             id: el.id,
             policyNum: el.policyNum,
             risk: el.Risk,
+            insurer: el.InsuranceCarriers.name,
+            branch: el.SubBranchs.name,
+
             insuredValue: el.insuredValue,
             Acciones: list(el.id, user, router).map((item, index) => (
                 <ActionRow {...item} key={index} />

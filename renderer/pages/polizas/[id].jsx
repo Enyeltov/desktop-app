@@ -23,7 +23,6 @@ export default function WatchPoliza() {
         getValues,
         formState: { errors },
     } = useForm({
-        defaultValues: polizas,
         resolver: yupResolver(schema),
     });
 
@@ -110,7 +109,6 @@ export default function WatchPoliza() {
             getPoliciesGeneralData(user, router, config, 'policy-status', fileteredData),
             getPoliciesGeneralData(user, router, config, 'relation-policy-status', fileteredData),
             getPoliciesGeneralData(user, router, config, 'periodicities', fileteredData),
-            getPoliciesGeneralData(user, router, config, 'currencies', fileteredData),
         ]).then(value => {
             setgeneralSelects(value)
         })
@@ -129,8 +127,8 @@ export default function WatchPoliza() {
     const selectSubBranchData = {
         classes,
         name: 'subBranchId',
-        text: 'Sub Ramo',
-        selectedIndex: polizas?.subBranchId,
+        text: 'Ramo de Seguros',
+        defaultValue: polizas?.subBranchId,
         register,
         // validate,
         errors
@@ -231,16 +229,14 @@ export default function WatchPoliza() {
     
     return (
         <>
-            <Layout title="Actualizar Poliza">
+            <Layout title="Ver Poliza" user = {user}>
                 
                 <form className=" w-full bg-white p-16">
                     <div className="grid gap-6 mb-6 lg:grid-cols-2">
                         {stateMachine[polizas.BranchTypes.name]}
                     </div>
+                    <button type="button" onClick={() => router.push('/polizas')} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 mx-1">Regresar</button>
                 </form>
-                <div className="grid gap-6 mb-6 lg:grid-cols-4">
-                <button className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={() => router.push('/polizas')}>Regresar</button>
-                </div>
             </Layout>
         </>
     )
