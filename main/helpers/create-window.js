@@ -71,6 +71,7 @@ export default function createWindow(windowName, options) {
   win = new BrowserWindow({
     ...options,
     ...state,
+    icon:'resources/best-global-logo.ico'
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
